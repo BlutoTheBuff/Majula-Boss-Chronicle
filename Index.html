@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Majula Boss Chronicle</title>
+    <style>
+        /* Majula-inspired Dark & Gold Palette */
+        :root {
+            --midnight: #0f1620;
+            --twilight: #1a2435;
+            --dusk: #2a3542;
+            --gold: #d4af37;
+            --parchment: #f5f0e6;
+            --stone: #7a7a8a;
+        }
+
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background-color: var(--midnight);
+            color: var(--parchment);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            padding: 3rem 0;
+            text-align: center;
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        h1 {
+            color: var(--gold);
+            font-size: 3rem;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: var(--parchment);
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            font-style: italic;
+        }
+
+        /* View Toggle */
+        .view-toggle {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .view-btn {
+            background: rgba(42, 53, 66, 0.6);
+            border: 1px solid var(--gold);
+            color: var(--parchment);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .view-btn.active {
+            background: var(--gold);
+            color: var(--midnight);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 0;
+        }
+
+        /* Progress Tracker */
+        .progress-container {
+            background-color: rgba(42, 53, 66, 0.6);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 3rem;
+            border: 1px solid var(--gold);
+            text-align: center;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: var(--dusk);
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid var(--gold);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gold);
+            width: 0%;
+            transition: width 0.5s ease-out;
+        }
+
+        /* Content Sections */
+        .content-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-header {
+            color: var(--gold);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+            border-left: 4px solid var(--gold);
+            font-weight: 600;
+        }
+
+        /* Location Grid */
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Location List */
+        .location-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Location Card */
+        .location-card {
+            background: rgba(42, 53, 66, 0.6);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--gold);
+        }
+
+        .location-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem;
+            background: rgba(42, 53, 66, 0.8);
+            border-bottom: 1px solid var(--gold);
+        }
+
+        .location-name {
+            font-size: 1.2rem;
+            color: var(--parchment);
+            letter-spacing: 0.5px;
+        }
+
+        .location-number {
+            background: var(--gold);
+            color: var(--midnight);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: 1px solid var(--gold);
+        }
+
+        /* Boss List */
+        .boss-list {
+            list-style: none;
+        }
+
+        .boss-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid rgba(122, 122, 138, 0.2);
+        }
+
+        .boss-item:last-child {
+            border-bottom: none;
+        }
+
+        .boss-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-grow: 1;
+        }
+
+        .boss-number {
+            color: var(--gold);
+            font-weight: bold;
+            min-width: 24px;
+        }
+
+        /* Custom Checkbox */
+        .boss-checkbox {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--gold);
+            border-radius: 4px;
+            background-color: transparent;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .boss-checkbox:checked {
+            background-color: var(--gold);
+            border-color: var(--gold);
+        }
+
+        .boss-checkbox:checked::after {
+            content: "✓";
+            position: absolute;
+            color: var(--midnight);
+            font-size: 12px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .boss-name {
+            flex-grow: 1;
+            font-size: 1rem;
+        }
+
+        .optional {
+            color: var(--stone);
+            font-style: italic;
+        }
+
+        /* Notes System */
+        .notes-btn {
+            background: none;
+            border: none;
+            color: var(--gold);
+            cursor: pointer;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.9rem;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .notes-content {
+            display: none;
+            padding: 1rem 1.2rem;
+            background-color: rgba(42, 53, 66, 0.8);
+            border-left: 3px solid var(--gold);
+            font-size: 0.9rem;
+            color: var(--parchment);
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .notes-content.show {
+            display: block;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .location-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="header">
+        <h1>Majula Boss Chronicle</h1>
+        <p class="subtitle">Bearer of the Curse's Journey</p>
+    </div>
+    
+    <div class="main-content">
+        <div class="progress-container">
+            <div class="progress-text">
+                <span>Journey Progress</span>
+                <span id="progress-text">0/40 (0%)</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+        
+        <div class="view-toggle">
+            <button class="view-btn" id="list-view-btn">List View</button>
+            <button class="view-btn active" id="grid-view-btn">Grid View</button>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-header">Base Game</h2>
+            <div class="location-grid" id="locations-container">
+                <!-- Locations will be inserted here by JavaScript -->
+            </div>
+            <div class="location-list" id="locations-list-container" style="display: none;">
+                <!-- List view will be inserted here by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2 class="section-header">DLC Content</h2>
+            <div id="dlc-sections-container">
+                <!-- DLC sections will be inserted here by JavaScript -->
+            </div>
+            <div id="dlc-list-container" style="display: none;">
+                <!-- DLC list view will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Complete Boss Data
+        const bossData = {
+            baseGame: [
+                {
+                    name: "Forest of Fallen Giants",
+                    bosses: [
+                        { id: 1, name: "The Last Giant", optional: false, notes: "" },
+                        { id: 2, name: "The Pursuer", optional: true, notes: "Optional if Flexile Sentry is defeated. Must be defeated to gain entry into the Memory of Orro." }
+                    ]
+                },
+                {
+                    name: "Heide's Tower of Flame",
+                    bosses: [
+                        { id: 3, name: "Dragonrider", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Cathedral of Blue",
+                    bosses: [
+                        { id: 4, name: "Old Dragonslayer", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "No-man's Wharf",
+                    bosses: [
+                        { id: 5, name: "Flexile Sentry", optional: true, notes: "Optional if The Pursuer and Ruin Sentinels are defeated" }
+                    ]
+                },
+                {
+                    name: "The Lost Bastille",
+                    bosses: [
+                        { id: 6, name: "Ruin Sentinels", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Belfry Luna",
+                    bosses: [
+                        { id: 7, name: "Belfry Gargoyles", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Sinners' Rise",
+                    bosses: [
+                        { id: 8, name: "Lost Sinner", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Huntsman's Copse",
+                    bosses: [
+                        { id: 9, name: "Skeleton Lords", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Undead Purgatory",
+                    bosses: [
+                        { id: 10, name: "Executioner's Chariot", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Harvest Valley",
+                    bosses: [
+                        { id: 11, name: "Covetous Demon", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Earthen Peak",
+                    bosses: [
+                        { id: 12, name: "Mytha, the Baneful Queen", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Iron Keep",
+                    bosses: [
+                        { id: 13, name: "Smelter Demon", optional: false, notes: "" },
+                        { id: 14, name: "Old Iron King", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Grave of Saints",
+                    bosses: [
+                        { id: 15, name: "Royal Rat Vanguard", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Black Gulch",
+                    bosses: [
+                        { id: 16, name: "The Rotten", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Shaded Woods",
+                    bosses: [
+                        { id: 17, name: "Scorpioness Najka", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Doors of Pharros",
+                    bosses: [
+                        { id: 18, name: "Royal Rat Authority", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Brightstone Cove Tseldora",
+                    bosses: [
+                        { id: 19, name: "Prowling Magus and Congregation", optional: false, notes: "" },
+                        { id: 20, name: "The Duke's Dear Freja", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Drangleic Castle",
+                    bosses: [
+                        { id: 21, name: "Dragonrider", optional: false, notes: "Two dragonriders" },
+                        { id: 22, name: "Looking Glass Knight", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Dark Chasm of Old",
+                    bosses: [
+                        { id: 23, name: "Darklurker", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Shrine of Amana",
+                    bosses: [
+                        { id: 24, name: "Demon of Song", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Undead Crypt",
+                    bosses: [
+                        { id: 25, name: "Velstadt, the Royal Aegis", optional: false, notes: "" },
+                        { id: 26, name: "Vendrick", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Aldia's Keep",
+                    bosses: [
+                        { id: 27, name: "Guardian Dragon", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Dragon Shrine",
+                    bosses: [
+                        { id: 28, name: "Ancient Dragon", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Memory of Jeigh",
+                    bosses: [
+                        { id: 29, name: "Giant Lord", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Throne of Want",
+                    bosses: [
+                        { id: 30, name: "Throne Watcher and Defender", optional: false, notes: "" },
+                        { id: 31, name: "Nashandra", optional: false, notes: "" },
+                        { id: 32, name: "Aldia, Scholar of the First Sin", optional: false, notes: "" }
+                    ]
+                }
+            ],
+            dlc: [
+                {
+                    name: "Dragon's Sanctum",
+                    dlcName: "Crown of the Sunken King",
+                    bosses: [
+                        { id: 33, name: "Elana, the Squalid Queen", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Cave of the Dead",
+                    dlcName: "Crown of the Sunken King",
+                    bosses: [
+                        { id: 34, name: "Afflicted Graverobber, Ancient Soldier Varg, and Cerah the Old Explorer", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Dragon's Rest",
+                    dlcName: "Crown of the Sunken King",
+                    bosses: [
+                        { id: 35, name: "Sinh, the Slumbering Dragon", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Brume Tower",
+                    dlcName: "Crown of the Old Iron King",
+                    bosses: [
+                        { id: 36, name: "Fume Knight", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Memory of the Old Iron King",
+                    dlcName: "Crown of the Old Iron King",
+                    bosses: [
+                        { id: 37, name: "Sir Alonne", optional: true, notes: "Required for Soul of Nadalia" }
+                    ]
+                },
+                {
+                    name: "Iron Passage",
+                    dlcName: "Crown of the Old Iron King",
+                    bosses: [
+                        { id: 38, name: "Smelter Demon", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Frozen Eleum Loyce",
+                    dlcName: "Crown of the Ivory King",
+                    bosses: [
+                        { id: 39, name: "Aava, the King's Pet", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Grand Cathedral",
+                    dlcName: "Crown of the Ivory King",
+                    bosses: [
+                        { id: 40, name: "Burnt Ivory King", optional: false, notes: "" }
+                    ]
+                },
+                {
+                    name: "Frigid Outskirts",
+                    dlcName: "Crown of the Ivory King",
+                    bosses: [
+                        { id: 41, name: "Lud, the King's Pet & Zallen, the King's Pet", optional: false, notes: "" }
+                    ]
+                }
+            ]
+        };
+
+        // DOM elements
+        const locationsContainer = document.getElementById('locations-container');
+        const locationsListContainer = document.getElementById('locations-list-container');
+        const dlcSectionsContainer = document.getElementById('dlc-sections-container');
+        const dlcListContainer = document.getElementById('dlc-list-container');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const gridViewBtn = document.getElementById('grid-view-btn');
+        const listViewBtn = document.getElementById('list-view-btn');
+
+        // View state
+        let currentView = localStorage.getItem('viewPreference') || 'list';
+
+        // Initialize the app
+        function init() {
+            renderLocations();
+            loadProgress();
+            updateProgress();
+            setupViewToggle();
+            setInitialView();
+        }
+
+        // Set initial view based on saved preference
+        function setInitialView() {
+            if (currentView === 'list') {
+                listViewBtn.classList.add('active');
+                gridViewBtn.classList.remove('active');
+                locationsContainer.style.display = 'none';
+                locationsListContainer.style.display = 'flex';
+                dlcSectionsContainer.style.display = 'none';
+                dlcListContainer.style.display = 'block';
+                renderListViews();
+            } else {
+                gridViewBtn.classList.add('active');
+                listViewBtn.classList.remove('active');
+                locationsContainer.style.display = 'grid';
+                locationsListContainer.style.display = 'none';
+                dlcSectionsContainer.style.display = 'block';
+                dlcListContainer.style.display = 'none';
+            }
+        }
+
+        // Set up view toggle buttons
+        function setupViewToggle() {
+            gridViewBtn.addEventListener('click', () => {
+                if (currentView !== 'grid') {
+                    currentView = 'grid';
+                    localStorage.setItem('viewPreference', 'grid');
+                    gridViewBtn.classList.add('active');
+                    listViewBtn.classList.remove('active');
+                    locationsContainer.style.display = 'grid';
+                    locationsListContainer.style.display = 'none';
+                    dlcSectionsContainer.style.display = 'block';
+                    dlcListContainer.style.display = 'none';
+                }
+            });
+
+            listViewBtn.addEventListener('click', () => {
+                if (currentView !== 'list') {
+                    currentView = 'list';
+                    localStorage.setItem('viewPreference', 'list');
+                    listViewBtn.classList.add('active');
+                    gridViewBtn.classList.remove('active');
+                    locationsContainer.style.display = 'none';
+                    locationsListContainer.style.display = 'flex';
+                    dlcSectionsContainer.style.display = 'none';
+                    dlcListContainer.style.display = 'block';
+                    renderListViews();
+                }
+            });
+        }
+
+        // Render all locations
+        function renderLocations() {
+            renderBaseGameLocations();
+            renderDLCSections();
+        }
+
+        // Render base game locations
+        function renderBaseGameLocations() {
+            locationsContainer.innerHTML = '';
+            locationsListContainer.innerHTML = '';
+            
+            bossData.baseGame.forEach((location, index) => {
+                const locationElement = createLocationElement(location, index + 1);
+                locationsContainer.appendChild(locationElement);
+                
+                const listLocationElement = createListLocationElement(location, index + 1);
+                locationsListContainer.appendChild(listLocationElement);
+            });
+        }
+
+        // Render DLC sections
+        function renderDLCSections() {
+            dlcSectionsContainer.innerHTML = '';
+            dlcListContainer.innerHTML = '';
+            
+            const dlcGroups = {};
+            bossData.dlc.forEach(location => {
+                if (!dlcGroups[location.dlcName]) {
+                    dlcGroups[location.dlcName] = [];
+                }
+                dlcGroups[location.dlcName].push(location);
+            });
+            
+            let dlcCounter = bossData.baseGame.length + 1;
+            
+            Object.entries(dlcGroups).forEach(([dlcName, locations]) => {
+                // Grid view
+                const dlcSection = document.createElement('div');
+                dlcSection.className = 'content-section';
+                
+                const dlcHeader = document.createElement('h2');
+                dlcHeader.className = 'section-header';
+                dlcHeader.textContent = dlcName;
+                dlcSection.appendChild(dlcHeader);
+                
+                const dlcContainer = document.createElement('div');
+                dlcContainer.className = 'location-grid';
+                
+                locations.forEach(location => {
+                    const locationElement = createLocationElement(location, dlcCounter);
+                    dlcContainer.appendChild(locationElement);
+                    dlcCounter++;
+                });
+                
+                dlcSection.appendChild(dlcContainer);
+                dlcSectionsContainer.appendChild(dlcSection);
+                
+                // List view
+                const dlcListSection = document.createElement('div');
+                dlcListSection.className = 'content-section';
+                
+                const dlcListHeader = document.createElement('h2');
+                dlcListHeader.className = 'section-header';
+                dlcListHeader.textContent = dlcName;
+                dlcListSection.appendChild(dlcListHeader);
+                
+                const dlcList = document.createElement('div');
+                dlcList.className = 'location-list';
+                
+                locations.forEach(location => {
+                    const listLocationElement = createListLocationElement(location, dlcCounter - locations.length + locations.indexOf(location) + 1);
+                    dlcList.appendChild(listLocationElement);
+                });
+                
+                dlcListSection.appendChild(dlcList);
+                dlcListContainer.appendChild(dlcListSection);
+            });
+        }
+
+        // Render list views when switching to list view
+        function renderListViews() {
+            locationsListContainer.innerHTML = '';
+            dlcListContainer.innerHTML = '';
+            
+            // Base game
+            bossData.baseGame.forEach((location, index) => {
+                const listLocationElement = createListLocationElement(location, index + 1);
+                locationsListContainer.appendChild(listLocationElement);
+            });
+            
+            // DLC
+            const dlcGroups = {};
+            bossData.dlc.forEach(location => {
+                if (!dlcGroups[location.dlcName]) {
+                    dlcGroups[location.dlcName] = [];
+                }
+                dlcGroups[location.dlcName].push(location);
+            });
+            
+            let dlcCounter = bossData.baseGame.length + 1;
+            
+            Object.entries(dlcGroups).forEach(([dlcName, locations]) => {
+                const dlcListSection = document.createElement('div');
+                dlcListSection.className = 'content-section';
+                
+                const dlcListHeader = document.createElement('h2');
+                dlcListHeader.className = 'section-header';
+                dlcListHeader.textContent = dlcName;
+                dlcListSection.appendChild(dlcListHeader);
+                
+                const dlcList = document.createElement('div');
+                dlcList.className = 'location-list';
+                
+                locations.forEach(location => {
+                    const listLocationElement = createListLocationElement(location, dlcCounter);
+                    dlcList.appendChild(listLocationElement);
+                    dlcCounter++;
+                });
+                
+                dlcListSection.appendChild(dlcList);
+                dlcListContainer.appendChild(dlcListSection);
+            });
+        }
+
+        // Create a grid location element
+        function createLocationElement(location, number) {
+            const locationElement = document.createElement('div');
+            locationElement.className = 'location-card';
+            
+            const locationHeader = document.createElement('div');
+            locationHeader.className = 'location-header';
+            
+            const locationName = document.createElement('div');
+            locationName.className = 'location-name';
+            locationName.textContent = location.name;
+            
+            const locationNumber = document.createElement('div');
+            locationNumber.className = 'location-number';
+            locationNumber.textContent = number;
+            
+            locationHeader.appendChild(locationName);
+            locationHeader.appendChild(locationNumber);
+            
+            const bossList = document.createElement('ul');
+            bossList.className = 'boss-list';
+            
+            location.bosses.forEach(boss => {
+                const bossItem = document.createElement('li');
+                bossItem.className = 'boss-item';
+                
+                const bossInfo = document.createElement('div');
+                bossInfo.className = 'boss-info';
+                
+                const bossNumber = document.createElement('span');
+                bossNumber.className = 'boss-number';
+                bossNumber.textContent = boss.id;
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'boss-checkbox';
+                checkbox.id = `boss-${boss.id}`;
+                checkbox.dataset.bossId = boss.id;
+                checkbox.checked = localStorage.getItem(`boss-${boss.id}`) === 'true';
+                checkbox.addEventListener('change', function() {
+                    localStorage.setItem(`boss-${boss.id}`, this.checked);
+                    updateProgress();
+                });
+                
+                const bossName = document.createElement('span');
+                bossName.className = `boss-name ${boss.optional ? 'optional' : ''}`;
+                bossName.textContent = boss.name;
+                if (boss.optional) {
+                    bossName.textContent += ' *';
+                }
+                
+                bossInfo.appendChild(bossNumber);
+                bossInfo.appendChild(checkbox);
+                bossInfo.appendChild(bossName);
+                
+                const bossActions = document.createElement('div');
+                
+                if (boss.notes) {
+                    const notesButton = document.createElement('button');
+                    notesButton.className = 'notes-btn';
+                    notesButton.textContent = 'Notes';
+                    notesButton.addEventListener('click', function() {
+                        const notesContent = this.closest('.boss-item').nextElementSibling;
+                        notesContent.classList.toggle('show');
+                    });
+                    
+                    bossActions.appendChild(notesButton);
+                }
+                
+                bossItem.appendChild(bossInfo);
+                bossItem.appendChild(bossActions);
+                bossList.appendChild(bossItem);
+                
+                if (boss.notes) {
+                    const notesContent = document.createElement('div');
+                    notesContent.className = 'notes-content';
+                    notesContent.textContent = boss.notes;
+                    bossList.appendChild(notesContent);
+                }
+            });
+            
+            locationElement.appendChild(locationHeader);
+            locationElement.appendChild(bossList);
+            
+            return locationElement;
+        }
+
+        // Create a list location element
+        function createListLocationElement(location, number) {
+            const locationElement = document.createElement('div');
+            locationElement.className = 'location-card';
+            
+            const locationHeader = document.createElement('div');
+            locationHeader.className = 'location-header';
+            
+            const locationName = document.createElement('div');
+            locationName.className = 'location-name';
+            locationName.textContent = `${number}. ${location.name}`;
+            
+            locationHeader.appendChild(locationName);
+            
+            const bossList = document.createElement('ul');
+            bossList.className = 'boss-list';
+            
+            location.bosses.forEach(boss => {
+                const bossItem = document.createElement('li');
+                bossItem.className = 'boss-item';
+                
+                const bossInfo = document.createElement('div');
+                bossInfo.className = 'boss-info';
+                
+                const bossNumber = document.createElement('span');
+                bossNumber.className = 'boss-number';
+                bossNumber.textContent = boss.id;
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'boss-checkbox';
+                checkbox.id = `boss-${boss.id}-list`;
+                checkbox.dataset.bossId = boss.id;
+                checkbox.checked = localStorage.getItem(`boss-${boss.id}`) === 'true';
+                checkbox.addEventListener('change', function() {
+                    localStorage.setItem(`boss-${boss.id}`, this.checked);
+                    document.getElementById(`boss-${boss.id}`).checked = this.checked;
+                    updateProgress();
+                });
+                
+                const bossName = document.createElement('span');
+                bossName.className = `boss-name ${boss.optional ? 'optional' : ''}`;
+                bossName.textContent = boss.name;
+                if (boss.optional) {
+                    bossName.textContent += ' *';
+                }
+                
+                bossInfo.appendChild(bossNumber);
+                bossInfo.appendChild(checkbox);
+                bossInfo.appendChild(bossName);
+                
+                const bossActions = document.createElement('div');
+                
+                if (boss.notes) {
+                    const notesButton = document.createElement('button');
+                    notesButton.className = 'notes-btn';
+                    notesButton.textContent = 'Notes';
+                    notesButton.addEventListener('click', function() {
+                        const notesContent = this.closest('.boss-item').nextElementSibling;
+                        notesContent.classList.toggle('show');
+                    });
+                    
+                    bossActions.appendChild(notesButton);
+                }
+                
+                bossItem.appendChild(bossInfo);
+                bossItem.appendChild(bossActions);
+                bossList.appendChild(bossItem);
+                
+                if (boss.notes) {
+                    const notesContent = document.createElement('div');
+                    notesContent.className = 'notes-content';
+                    notesContent.textContent = boss.notes;
+                    bossList.appendChild(notesContent);
+                }
+            });
+            
+            locationElement.appendChild(locationHeader);
+            locationElement.appendChild(bossList);
+            
+            return locationElement;
+        }
+
+        // Update progress
+        function updateProgress() {
+            let checkedCount = 0;
+            const totalBosses = 41;
+            
+            for (let i = 1; i <= totalBosses; i++) {
+                if (localStorage.getItem(`boss-${i}`) === 'true') {
+                    checkedCount++;
+                }
+            }
+            
+            const percentage = Math.round((checkedCount / totalBosses) * 100);
+            progressFill.style.width = `${percentage}%`;
+            progressText.textContent = `${checkedCount}/${totalBosses} (${percentage}%)`;
+        }
+
+        // Load saved progress
+        function loadProgress() {
+            updateProgress();
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
