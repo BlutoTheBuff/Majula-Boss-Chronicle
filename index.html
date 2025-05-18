@@ -12,7 +12,7 @@
             --dusk: #2a3542;
             --gold: #d4af37;
             --parchment: #f5f0e6;
-            --stone: #7a7a8a;
+            --stone: #B8B9BF;
         }
 
         /* Base Styles */
@@ -867,12 +867,18 @@
             const locationName = document.createElement('div');
             locationName.className = 'location-name';
             locationName.textContent = `${number}. ${location.name}`;
-            
+			
             locationHeader.appendChild(locationName);
             
             const bossList = document.createElement('ul');
             bossList.className = 'boss-list';
             
+						const locationNumber = document.createElement('div');
+            locationNumber.className = 'location-number';
+            locationNumber.textContent = number;
+            locationHeader.appendChild(locationNumber);
+
+			
             location.bosses.forEach(boss => {
                 const bossItem = document.createElement('li');
                 bossItem.className = 'boss-item';
@@ -900,9 +906,8 @@
                 bossName.className = `boss-name ${boss.optional ? 'optional' : ''}`;
                 bossName.textContent = boss.name;
                 if (boss.optional) {
-                    bossName.textContent += ' *';
+                    bossName.textContent += ' (Optional)';
                 }
-                
                 bossInfo.appendChild(bossNumber);
                 bossInfo.appendChild(checkbox);
                 bossInfo.appendChild(bossName);
